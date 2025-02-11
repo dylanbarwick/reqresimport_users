@@ -1,16 +1,16 @@
 ## INTRODUCTION
 
-The Reqres import - users module is a DESCRIBE_THE_MODULE_HERE.
+The "Reqres import - users" module is a sub-module to the parent module:
+`reqresimport`. It lists the parent as a requirement and will borrow
+various configurations, facilities and services from it.
 
-The primary use case for this module is:
+It will retrieve data from the `https://reqres.in/api/users` API and
+present it via a configurable block in a table with AJAX-enabled pagination.
 
-- Use case #1
-- Use case #2
-- Use case #3
 
 ## REQUIREMENTS
 
-DESCRIBE_MODULE_DEPENDENCIES_HERE
+`reqresimport` module.
 
 ## INSTALLATION
 
@@ -18,13 +18,6 @@ Install as you would normally install a contributed Drupal module.
 See: https://www.drupal.org/node/895232 for further information.
 
 ## CONFIGURATION
-- Configuration step #1
-- Configuration step #2
-- Configuration step #3
-
-## MAINTAINERS
-
-Current maintainers for Drupal 10:
-
-- FIRST_NAME LAST_NAME (NICKNAME) - https://www.drupal.org/u/NICKNAME
-
+- Place the "Reqres users" block on a page as you would normally
+- configure the block using the settings form included with the block
+- view the page as normal and enjoy the paginated table of users
