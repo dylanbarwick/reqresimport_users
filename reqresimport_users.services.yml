@@ -1,0 +1,8 @@
+services:
+  reqresimport_users.utilities:
+    class: Drupal\reqresimport_users\Service\Utilities
+    arguments: ['@config.factory']
+
+  reqresimport_users.table_content_service:
+    class: Drupal\reqresimport_users\Service\TableContentService
+    arguments: ['@messenger', '@current_user', '@pager.manager']

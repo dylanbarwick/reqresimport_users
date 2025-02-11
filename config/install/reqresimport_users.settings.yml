@@ -1,0 +1,2 @@
+default_url: 'https://reqres.in'
+default_endpoint: '/api/users'

@@ -1,0 +1,3 @@
+view reqres users block:
+  title: 'View reqres users block'
+  description: 'Allow the reqres users block to be rendered.'

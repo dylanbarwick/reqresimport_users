@@ -1,0 +1,13 @@
+reqresimport_users.reqres_users_settings:
+  path: '/admin/config/system/reqres-users-settings'
+  defaults:
+    _title: 'Reqres users settings'
+    _form: 'Drupal\reqresimport_users\Form\ReqresUsersSettingsForm'
+  requirements:
+    _permission: 'administer site configuration'
+reqresimport_users.refresh_table:
+  path: '/refresh-users-table'
+  defaults:
+    _controller: '\Drupal\reqresimport_users\Controller\ReqresImportUsersAjaxPagerTableController::refreshAjaxBlock'
+  requirements:
+    _permission: 'access content'

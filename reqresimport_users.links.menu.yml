@@ -1,0 +1,6 @@
+reqresimport_users.reqres_users_settings:
+  title: Reqres users settings
+  description: Settings for the reqres users module.
+  parent: reqresimport.reqres_parent_menu
+  route_name: reqresimport_users.reqres_users_settings
+  weight: 10

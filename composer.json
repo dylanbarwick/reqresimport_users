@@ -1,0 +1,22 @@
+{
+  "name": "drupal/reqresimport_users",
+  "type": "drupal-custom-module",
+  "description": "Import data from the reqres API that is specific to the `/api/user` endpoint.",
+  "keywords": ["Drupal"],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  ],
+  "require": {
+    "composer/installers": "^1.2",
+    "drupal/core": "^8.9.0",
+    "drupal/reqresimport": "^1.0"
+  },
+  "extra": {
+    "installer-paths": {
+      "modules/custom/{$name}": ["type:drupal-custom-module"]
+    }
+  }
+}

@@ -1,0 +1,7 @@
+name: 'Reqres import - users'
+type: module
+description: 'A module to import data from the reqres API but specifically the users.'
+package: Reqres
+core_version_requirement: ^10 || ^11
+dependencies:
+  - reqresimport:reqresimport
