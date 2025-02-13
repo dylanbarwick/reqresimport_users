@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\reqresimport_users\Plugin\Block;
 
-use Drupal\reqresimport_users\Service\TableContentService;
+use Drupal\reqresimport\Service\TableContentServiceBase;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -27,9 +27,9 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
   /**
    * The table content service.
    *
-   * @var \Drupal\reqresimport_users\Service\TableContentService
+   * @var \Drupal\reqresimport\Service\TableContentServiceBase
    */
-  protected $tableContentService;
+  protected $tableContentServiceBase;
 
     /**
    * Constructs a new ReqresImportUsersAjaxBlock instance.
@@ -40,7 +40,7 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
    *   The plugin ID for the plugin instance.
    * @param $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\reqresimport_users\Service\TableContentService $tableContentService
+   * @param \Drupal\reqresimport\Service\TableContentServiceBase $tableContentServiceBase
    *   The table content service.
    */
   public function __construct(
@@ -48,10 +48,10 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
     $plugin_id,
     $plugin_definition,
     MessengerInterface $messenger,
-    TableContentService $tableContentService,
+    TableContentServiceBase $tableContentServiceBase,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->tableContentService = $tableContentService;
+    $this->tableContentServiceBase = $tableContentServiceBase;
     $this->messenger = $messenger;
   }
 
@@ -64,7 +64,7 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
       $plugin_id,
       $plugin_definition,
       $container->get('messenger'),
-      $container->get('reqresimport_users.table_content_service'),
+      $container->get('reqresimport.table_content_service_base'),
     );
   }
 
@@ -75,8 +75,8 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
     return [
       'per_page' => 6,
       'email_label' => $this->t('Email'),
-      'forename_label' => $this->t('Forename'),
-      'surname_label' => $this->t('Surname'),
+      'first_name_label' => $this->t('Forename'),
+      'last_name_label' => $this->t('Surname'),
     ];
   }
 
@@ -101,17 +101,17 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
     ];
 
     // Forename label.
-    $form['forename_label'] = [
+    $form['first_name_label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Forename label'),
-      '#default_value' => $this->configuration['forename_label'],
+      '#default_value' => $this->configuration['first_name_label'],
     ];
 
     // Surname label.
-    $form['surname_label'] = [
+    $form['last_name_label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Surname label'),
-      '#default_value' => $this->configuration['surname_label'],
+      '#default_value' => $this->configuration['last_name_label'],
     ];
     return $form;
   }
@@ -122,25 +122,40 @@ final class ReqresImportUsersBlock extends BlockBase implements ContainerFactory
   public function blockSubmit($form, FormStateInterface $form_state): void {
     $this->configuration['per_page'] = $form_state->getValue('per_page');
     $this->configuration['email_label'] = $form_state->getValue('email_label');
-    $this->configuration['forename_label'] = $form_state->getValue('forename_label');
-    $this->configuration['surname_label'] = $form_state->getValue('surname_label');
+    $this->configuration['first_name_label'] = $form_state->getValue('first_name_label');
+    $this->configuration['last_name_label'] = $form_state->getValue('last_name_label');
   }
 
   /**
    * {@inheritdoc}
    */
   public function build(): array {
-
     // Get values from block config.
     $block_config = $this->getConfiguration();
-    $page = \Drupal::request()->query->get('page') ?? 0;
-    $build = $this->tableContentService->getTableContent(
+    // Get user utilities.
+    $json_user_utils = \Drupal::service('reqresimport_users.utilities');
+    $user_settings = $json_user_utils->getSettings();
+    $url = $user_settings['default_url'] . $user_settings['default_endpoint'];
+    $label_map = $json_user_utils->getRetrievedFieldLabels();
+    foreach ($label_map as $key => $field_label_map) {
+      // Check if the value is a string.
+      if (!is_string($block_config[$field_label_map['our_label']])) {
+        $label_map[$key]['our_value'] = $block_config[$field_label_map['our_label']]->__toString();
+      }
+      else {
+        $label_map[$key]['our_value'] = $block_config[$field_label_map['our_label']];
+      }
+
+    }
+
+    $page = (int) \Drupal::request()->query->get('page') ?? 0;
+    $build = $this->tableContentServiceBase->getTableContent(
       $block_config['id'],
       $block_config['per_page'],
-      $block_config['email_label'],
-      $block_config['forename_label'],
-      $block_config['surname_label'],
-      $page);
+      $url,
+      $page,
+      $label_map
+    );
 
     return $build;
   }

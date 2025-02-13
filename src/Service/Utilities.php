@@ -39,4 +39,27 @@ final class Utilities implements UtilitiesInterface {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getRetrievedFieldLabels(): array {
+    return [
+      [
+        'reqres_label' => 'email',
+        'our_label' => 'email_label',
+        'our_value' => '',
+      ],
+      [
+        'reqres_label' => 'first_name',
+        'our_label' => 'first_name_label',
+        'our_value' => '',
+      ],
+      [
+        'reqres_label' => 'last_name',
+        'our_label' => 'last_name_label',
+        'our_value' => '',
+      ],
+    ];
+  }
+
 }

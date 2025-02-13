@@ -2,7 +2,7 @@
 
 namespace Drupal\reqresimport_users\Controller;
 
-use Drupal\reqresimport_users\Service\TableContentService;
+use Drupal\reqresimport\Service\TableContentServiceBase;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\BeforeCommand;
 use Drupal\Core\Ajax\RemoveCommand;
@@ -24,9 +24,9 @@ class ReqresImportUsersAjaxPagerTableController extends ControllerBase {
   /**
    * The table content service.
    *
-   * @var \Drupal\reqresimport_users\Service\TableContentService
+   * @var \Drupal\reqresimport_users\Service\TableContentServiceBase
    */
-  protected $tableContentService;
+  protected $tableContentServiceBase;
 
   /**
    * The current user.
@@ -44,11 +44,11 @@ class ReqresImportUsersAjaxPagerTableController extends ControllerBase {
 
   public function __construct(
     MessengerInterface $messenger,
-    TableContentService $tableContentService,
+    TableContentServiceBase $tableContentServiceBase,
     AccountInterface $current_user,
     RequestStack $requestStack,
   ) {
-    $this->tableContentService = $tableContentService;
+    $this->tableContentServiceBase = $tableContentServiceBase;
     $this->messenger = $messenger;
     $this->currentUser = $current_user;
     $this->requestStack = $requestStack;
@@ -60,7 +60,7 @@ class ReqresImportUsersAjaxPagerTableController extends ControllerBase {
   public static function create(ContainerInterface $container): self {
     return new self(
       $container->get('messenger'),
-      $container->get('reqresimport_users.table_content_service'),
+      $container->get('reqresimport.table_content_service_base'),
       $container->get('current_user'),
       $container->get('request_stack'),
     );
@@ -90,9 +90,15 @@ class ReqresImportUsersAjaxPagerTableController extends ControllerBase {
       'id' => $this_block_config['id'],
       'per_page' => $this_block_config['per_page'],
       'email_label' => $this_block_config['email_label'],
-      'forename_label' => $this_block_config['forename_label'],
-      'surname_label' => $this_block_config['surname_label'],
+      'first_name_label' => $this_block_config['first_name_label'],
+      'last_name_label' => $this_block_config['last_name_label'],
     ];
+
+    // Draw up a fully-populated label_map array to feed to the table content service.
+    $json_user_utils = \Drupal::service('reqresimport_users.utilities');
+    $label_map = $json_user_utils->getRetrievedFieldLabels();
+    $user_settings = $json_user_utils->getSettings();
+    $url = $user_settings['default_url'] . $user_settings['default_endpoint'];
 
     $request = $this->requestStack->getCurrentRequest();
     if (is_null($request) || !$request->isXmlHttpRequest()) {
@@ -101,13 +107,12 @@ class ReqresImportUsersAjaxPagerTableController extends ControllerBase {
     $page_number = (int) $request->query->get('page') + 1;
 
     $response = new AjaxResponse();
-    $command = new ReplaceCommand('#ajax-pager-table-wrapper', $this->tableContentService->getTableContent(
-      $settings['id'],
-      $settings['per_page'],
-      $settings['email_label'],
-      $settings['forename_label'],
-      $settings['surname_label'],
-      $page_number));
+    $command = new ReplaceCommand('#ajax-pager-table-wrapper', $this->tableContentServiceBase->getTableContent(
+      $this_block_config['id'],
+      $this_block_config['per_page'],
+      $url,
+      $page_number,
+      $label_map));
     $response->addCommand($command);
 
     return $response;

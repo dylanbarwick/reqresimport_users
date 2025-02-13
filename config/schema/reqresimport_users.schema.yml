@@ -8,10 +8,10 @@ block.settings.reqresimport_users_block:
     email_label:
       type: string
       label: Email label
-    forename_label:
+    first_name_label:
       type: string
       label: Forename label
-    surname_label:
+    last_name_label:
       type: string
       label: Surname label
 
